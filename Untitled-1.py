@@ -10,39 +10,39 @@ class Panaderia:
         }
 
     def bienvenida(self):
-        print("="*50)
-        print("🍞 BIENVENIDO A LA PANADERÍA DON JOSÉ 🍞".center(50))
-        print("="*50)
-        print(f"\nBuenos días {self.propietario}, propietario de la panadería {self.nombre_local}, ubicada en {self.ubicacion}.\n")
+        print("\n" + "="*60)
+        print("|{:^58}|".format("= BIENVENIDO A LA PANADERÍA ="))
+        print("="*60)
+        print(f"| Propietario: {self.propietario:<44}|")
+        print(f"| Nombre del local: {self.nombre_local:<40}|")
+        print(f"| Ubicación: {self.ubicacion:<45}|")
+        print("="*60 + "\n")
 
     def agregar_inventario(self):
-        print("Vamos a registrar la cantidad de productos disponibles:\n")
+        print("Ingrese la cantidad inicial de productos:\n")
         for producto in self.inventario:
             while True:
                 try:
-                    cantidad = int(input(f"Ingrese la cantidad para '{producto.title()}': "))
+                    cantidad = int(input(f"Cantidad de '{producto.title()}': "))
                     self.inventario[producto]["cantidad"] = cantidad
                     break
                 except ValueError:
-                    print("Por favor, ingrese un número válido.")
+                    print("Ingrese un número válido.")
 
 
 class Cliente:
     def __init__(self):
-        self.nombre = input("Ingresa tu nombre: ").strip()
+        print("\n" + "#"*50)
+        print("#{:^48}#".format("🧺 PANADERÍA DON JOSÉ 🧺"))
+        print("#"*50)
+        self.nombre = input("Nombre del cliente: ").strip()
         self.carrito = {}
 
     def bienvenida(self):
-        print("""
-  _______              _                _           
- |__   __|            | |              | |          
-    | | __ _ _ __   __| | ___  ___  ___| |__   __ _ 
-    | |/ _` | '_ \\ / _` |/ _ \\/ __|/ __| '_ \\ / _` |
-    | | (_| | | | | (_| |  __/\\__ \\ (__| | | | (_| |
-    |_|\\__,_|_| |_|\\__,_|\\___||___/\\___|_| |_|\\__,_|
-
-        """)
-        print(f"¡Bienvenido {self.nombre}!")
+        print("\n" + "-"*50)
+        print(f"Hola {self.nombre}, bienvenido a la panadería Don José.")
+        print("Tenemos pan fresquito recién salido del horno!")
+        print("-"*50)
 
     def comprar(self, panaderia):
         total = 0
@@ -54,73 +54,78 @@ class Cliente:
             ]
 
             if not productos_disponibles:
-                print("❌ Lo sentimos, no hay productos disponibles en este momento.")
+                print("No hay productos disponibles en este momento.")
                 break
 
             if len(productos_disponibles) == 1:
                 nombre_producto, datos = productos_disponibles[0]
-                print(f"\n🔸 Solo queda un producto disponible: '{nombre_producto.title()}' - Q{datos['precio']:.2f} ({datos['cantidad']} disponibles)")
+                stock = datos["cantidad"]
+                precio = datos["precio"]
+
+                print(f"\nÚltimo producto disponible: '{nombre_producto.title()}'")
+                print(f"Precio: Q{precio:.2f} - Stock: {stock}")
                 while True:
-                    desea = input("¿Deseas comprar este producto? (si/no): ").strip().lower()
+                    desea = input(f"¿Deseas comprar '{nombre_producto}'? (si/no): ").strip().lower()
                     if desea not in ['si', 'no']:
-                        print("⚠️ Por favor escribe 'si' o 'no' para continuar.")
+                        print("Por favor escribe 'si' o 'no'.")
                         continue
                     break
-                if desea == 'si':
-                    while True:
-                        try:
-                            cantidad = int(input(f"¿Cuántos '{nombre_producto}' deseas?: "))
-                            stock = datos['cantidad']
-                            precio = datos['precio']
 
-                            if cantidad > stock:
-                                print(f"\n⚠️ Solo hay {stock} unidades disponibles.")
-                                while True:
-                                    aceptar = input(f"¿Deseas comprar esas {stock} unidades? (si/no): ").strip().lower()
-                                    if aceptar not in ['si', 'no']:
-                                        print("⚠️ Por favor escribe 'si' o 'no' para continuar.")
-                                        continue
-                                    break
-                                if aceptar == 'si':
-                                    cantidad = stock
-                                else:
-                                    break
-
-                            if cantidad > 0:
-                                self.carrito[nombre_producto] = self.carrito.get(nombre_producto, 0) + cantidad
-                                panaderia.inventario[nombre_producto]["cantidad"] -= cantidad
-                                total += cantidad * precio
-                                print(f"✔️ {cantidad} '{nombre_producto}' añadidos al carrito.")
-                        except ValueError:
-                            print("❗ Entrada no válida.")
-                else:
+                if desea == 'no':
                     print("Compra finalizada.")
+                    break
+
+                while True:
+                    try:
+                        cantidad = int(input(f"¿Cuántos '{nombre_producto}' deseas?: "))
+                        if cantidad > stock:
+                            print(f"Sólo tenemos {stock}.")
+                            while True:
+                                aceptar = input(f"¿Deseas comprar {stock}? (si/no): ").strip().lower()
+                                if aceptar not in ['si', 'no']:
+                                    print("Por favor escribe 'si' o 'no'.")
+                                    continue
+                                break
+                            if aceptar == 'si':
+                                cantidad = stock
+                            else:
+                                print("Compra finalizada.")
+                                break
+                        if cantidad > 0:
+                            self.carrito[nombre_producto] = cantidad
+                            panaderia.inventario[nombre_producto]["cantidad"] -= cantidad
+                            total += cantidad * precio
+                            print(f"{cantidad} '{nombre_producto}' añadidos.")
+                        break
+                    except ValueError:
+                        print("Ingresa un número válido.")
+                # No volver a ofrecer nada más aunque quede en stock
                 break
 
-            print("\n¿Qué producto deseas comprar?")
+            print("\nProductos disponibles:")
             for i, (nombre, datos) in enumerate(productos_disponibles, 1):
-                print(f"{i}. {nombre.title():<15} - Q{datos['precio']:.2f} ({datos['cantidad']} disponibles)")
+                print(f"{i}. {nombre.title()} - Q{datos['precio']:.2f} ({datos['cantidad']} disponibles)")
 
             try:
-                seleccion = int(input("Selecciona una opción (1-{0}) o 0 para terminar: ".format(len(productos_disponibles))))
+                seleccion = int(input(f"\nSelecciona un producto (1-{len(productos_disponibles)}) o 0 para terminar: "))
                 if seleccion == 0:
                     break
-                if seleccion < 1 or seleccion > len(productos_disponibles):
-                    print("❗ Selección inválida. Intenta de nuevo.")
+                if not 1 <= seleccion <= len(productos_disponibles):
+                    print("Opción inválida.")
                     continue
 
                 nombre_producto, datos = productos_disponibles[seleccion - 1]
-                stock = datos['cantidad']
-                precio = datos['precio']
+                stock = datos["cantidad"]
+                precio = datos["precio"]
 
                 cantidad = int(input(f"¿Cuántos '{nombre_producto}' deseas?: "))
 
                 if cantidad > stock:
-                    print(f"\n⚠️ Solo tenemos {stock} unidades de '{nombre_producto}'.")
+                    print(f"Sólo tenemos {stock} unidades.")
                     while True:
-                        aceptar = input(f"¿Deseas comprar esas {stock} unidades? (si/no): ").strip().lower()
+                        aceptar = input(f"¿Deseas comprar {stock}? (si/no): ").strip().lower()
                         if aceptar not in ['si', 'no']:
-                            print("⚠️ Por favor escribe 'si' o 'no' para continuar.")
+                            print("Por favor escribe 'si' o 'no'.")
                             continue
                         break
                     if aceptar == 'si':
@@ -129,7 +134,7 @@ class Cliente:
                         while True:
                             otro = input("¿Deseas intentar con otro producto? (si/no): ").strip().lower()
                             if otro not in ['si', 'no']:
-                                print("⚠️ Por favor escribe 'si' o 'no' para continuar.")
+                                print("Por favor escribe 'si' o 'no'.")
                                 continue
                             break
                         if otro == 'no':
@@ -142,40 +147,40 @@ class Cliente:
                     panaderia.inventario[nombre_producto]["cantidad"] -= cantidad
                     subtotal = cantidad * precio
                     total += subtotal
-                    print(f"✔️ {cantidad} '{nombre_producto}' añadidos - Subtotal: Q{subtotal:.2f}")
+                    print(f"{cantidad} '{nombre_producto}' añadidos - Subtotal: Q{subtotal:.2f}")
             except ValueError:
-                print("❗ Entrada no válida. Intenta de nuevo.")
+                print("Entrada inválida.")
 
         if self.carrito:
-            print("\n🧾 Resumen de compra:")
+            print("\n" + "="*50)
+            print(f"Resumen de compra de {self.nombre}:")
             for prod, cant in self.carrito.items():
                 precio_unitario = panaderia.inventario[prod]["precio"]
-                print(f"{prod.title():<15} x{cant:<3} - Q{cant * precio_unitario:.2f}")
-
-            print(f"\n💵 Total a pagar: Q{total:.2f}")
-            print(f"\nGracias por tu compra, {self.nombre}! ¡Vuelve pronto!\n")
+                print(f"- {prod.title()} x{cant} = Q{cant * precio_unitario:.2f}")
+            print(f"\nTotal a pagar: Q{total:.2f}")
+            print("="*50)
+            print(f"¡Gracias por tu compra, {self.nombre}! Hasta pronto.\n")
         else:
-            print("\nNo se realizaron compras. ¡Hasta la próxima!\n")
+            print("\nNo realizaste ninguna compra. ¡Vuelve pronto!\n")
 
 
 def main():
-    propietario = input("Ingrese su nombre como propietario de la panadería: ").strip()
+    propietario = input("Ingrese el nombre del propietario: ").strip()
     panaderia = Panaderia(propietario)
     panaderia.bienvenida()
     panaderia.agregar_inventario()
 
     while True:
-        abrir = input("¿Deseas abrir la panadería para atender clientes? (si/no): ").strip().lower()
-        if abrir not in ["si", "no"]:
-            print("⚠️ Por favor, escribe 'si' o 'no' para continuar.")
+        abrir = input("¿Deseas abrir la panadería para clientes? (si/no): ").strip().lower()
+        if abrir not in ['si', 'no']:
+            print("Por favor, escribe 'si' o 'no'.")
             continue
-        elif abrir == "no":
-            print("Panadería cerrada. ¡Hasta luego!")
+        if abrir == 'no':
+            print("Panadería cerrada. ¡Hasta la próxima!")
             break
-        else:
-            cliente = Cliente()
-            cliente.bienvenida()
-            cliente.comprar(panaderia)
+        cliente = Cliente()
+        cliente.bienvenida()
+        cliente.comprar(panaderia)
 
 
 if __name__ == "__main__":
