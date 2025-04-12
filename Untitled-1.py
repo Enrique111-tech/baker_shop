@@ -1,187 +1,217 @@
+import os
+import time
+
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def lento(texto, delay=0.012):
+    for char in texto:
+        print(char, end='', flush=True)
+        time.sleep(delay)
+    print()
+
+def logo_volcan():
+    print(r"""
+                          _    .  ,   .           .
+                      *  / \_ *  / \_      _  *        *   /\'__        *
+                        /    \  /    \,   ((        .    _/  /  \  *'.
+                   .   /\/\  /\/ :' __ \_  `          _^/  ^/    `--.
+                      /    \/  \  _/  \-'\      *    /.' ^_   \_   .'\  *
+                    /\  .-   `. \/     \ /==~=-=~=-=-;.  _/ \ -. `_/   \
+                   /  `-.__ ^   / .-'.--\ =-=~_=-=~=^/  _ `--./ .-'  `-
+  ~~~~~~~~^~~^~~^~~~^~~~~^~~^~~~^~~~~^~~~~^~~~^~^~~~^~^~~~~^~^~^~~~^~^~~
+            Bienvenidos a Don José – Panadería Tradicional Chapina
+    """)
+
+def marco_madera(titulo):
+    print("\n" + "═" * 70)
+    print(f"{titulo.center(70)}")
+    print("═" * 70 + "\n")
+
 class Panaderia:
     def __init__(self, propietario):
-        self.nombre_local = "Don José"
-        self.ubicacion = "Antigua Guatemala"
         self.propietario = propietario
+        self.nombre_local = "Don José Panadería"
+        self.ubicacion = "Antigua Guatemala"
         self.inventario = {
-            "pan frances": {"precio": 2.00, "cantidad": 0},
-            "pan grande": {"precio": 2.50, "cantidad": 0},
-            "tostado": {"precio": 0.25, "cantidad": 0}
+            "Pan Francés": {"precio": 2.00, "cantidad": 0},
+            "Pan Grande": {"precio": 2.50, "cantidad": 0},
+            "Tostado": {"precio": 0.25, "cantidad": 0}
         }
 
     def bienvenida(self):
-        print("\n" + "="*60)
-        print("|{:^58}|".format("= BIENVENIDO A LA PANADERÍA ="))
-        print("="*60)
-        print(f"| Propietario: {self.propietario:<44}|")
-        print(f"| Nombre del local: {self.nombre_local:<40}|")
-        print(f"| Ubicación: {self.ubicacion:<45}|")
-        print("="*60 + "\n")
+        clear()
+        logo_volcan()
+        marco_madera("🌄 Bienvenido al Corazón Panadero de Antigua 🌄")
+        print(f"👨‍🍳 ¡Buenos días, {self.propietario.title()}!")
+        print(f"🏠 Tienda: {self.nombre_local}")
+        print(f"📍 Ubicación: {self.ubicacion}")
+        print("\n🥖 Que el aroma del pan fresco llene las calles coloniales...\n")
 
     def agregar_inventario(self):
-        print("Ingrese la cantidad inicial de productos:\n")
+        print("🧺 ORGANIZA TU CANASTA DEL DÍA")
         for producto in self.inventario:
             while True:
                 try:
-                    cantidad = int(input(f"Cantidad de '{producto.title()}': "))
+                    cantidad = int(input(f"Ingresa la cantidad para '{producto}': "))
                     self.inventario[producto]["cantidad"] = cantidad
                     break
                 except ValueError:
-                    print("Ingrese un número válido.")
+                    lento("🚫 Por favor, ingresa un número válido.\n")
 
+    def mostrar_inventario(self):
+        print("\n📋 INVENTARIO ACTUAL")
+        print("-" * 50)
+        for producto, info in self.inventario.items():
+            print(f"{producto:<15} | Q{info['precio']:.2f} | {info['cantidad']} disponibles")
+        print("-" * 50 + "\n")
 
 class Cliente:
     def __init__(self):
-        print("\n" + "#"*50)
-        print("#{:^48}#".format("🧺 PANADERÍA DON JOSÉ 🧺"))
-        print("#"*50)
-        self.nombre = input("Nombre del cliente: ").strip()
+        marco_madera("👒 ¡Bienvenido a Don José Panadería! 👒")
+        print("🌽 Pasa adelante, te recibimos con los brazos abiertos y pan calientito.\n")
+        self.nombre = input("¿Cuál es tu nombre? ").strip().title()
         self.carrito = {}
 
     def bienvenida(self):
-        print("\n" + "-"*50)
-        print(f"Hola {self.nombre}, bienvenido a la panadería Don José.")
-        print("Tenemos pan fresquito recién salido del horno!")
-        print("-"*50)
+        print(f"\n🥯 {self.nombre}, mira lo que tenemos recién salido del horno:\n")
 
     def comprar(self, panaderia):
         total = 0
 
         while True:
-            productos_disponibles = [
-                (nombre, datos) for nombre, datos in panaderia.inventario.items()
-                if datos["cantidad"] > 0
-            ]
+            disponibles = [(nombre, info) for nombre, info in panaderia.inventario.items() if info["cantidad"] > 0]
 
-            if not productos_disponibles:
-                print("No hay productos disponibles en este momento.")
+            if not disponibles:
+                lento("😢 Ya no nos queda pan por hoy. ¡Gracias por venir!")
                 break
 
-            if len(productos_disponibles) == 1:
-                nombre_producto, datos = productos_disponibles[0]
-                stock = datos["cantidad"]
-                precio = datos["precio"]
-
-                print(f"\nÚltimo producto disponible: '{nombre_producto.title()}'")
-                print(f"Precio: Q{precio:.2f} - Stock: {stock}")
+            if len(disponibles) == 1:
+                nombre, info = disponibles[0]
+                stock = info["cantidad"]
+                precio = info["precio"]
+                print(f"\nÚltimo producto disponible: {nombre} (Q{precio:.2f}) - {stock} unidades")
                 while True:
-                    desea = input(f"¿Deseas comprar '{nombre_producto}'? (si/no): ").strip().lower()
+                    desea = input("¿Deseas comprarlo? (si/no): ").strip().lower()
                     if desea not in ['si', 'no']:
-                        print("Por favor escribe 'si' o 'no'.")
+                        lento("Responde con 'si' o 'no'.")
                         continue
                     break
-
                 if desea == 'no':
-                    print("Compra finalizada.")
                     break
-
                 while True:
                     try:
-                        cantidad = int(input(f"¿Cuántos '{nombre_producto}' deseas?: "))
+                        cantidad = int(input(f"¿Cuántos '{nombre}' deseas?: "))
                         if cantidad > stock:
-                            print(f"Sólo tenemos {stock}.")
+                            lento(f"Sólo tenemos {stock}.")
                             while True:
-                                aceptar = input(f"¿Deseas comprar {stock}? (si/no): ").strip().lower()
-                                if aceptar not in ['si', 'no']:
-                                    print("Por favor escribe 'si' o 'no'.")
+                                conf = input(f"¿Quieres los {stock}? (si/no): ").strip().lower()
+                                if conf not in ['si', 'no']:
+                                    lento("Por favor responde con 'si' o 'no'.")
                                     continue
                                 break
-                            if aceptar == 'si':
+                            if conf == 'si':
                                 cantidad = stock
                             else:
-                                print("Compra finalizada.")
                                 break
                         if cantidad > 0:
-                            self.carrito[nombre_producto] = cantidad
-                            panaderia.inventario[nombre_producto]["cantidad"] -= cantidad
+                            self.carrito[nombre] = cantidad
+                            panaderia.inventario[nombre]["cantidad"] -= cantidad
                             total += cantidad * precio
-                            print(f"{cantidad} '{nombre_producto}' añadidos.")
                         break
                     except ValueError:
-                        print("Ingresa un número válido.")
-                # No volver a ofrecer nada más aunque quede en stock
+                        lento("Ingresa un número válido.")
                 break
 
-            print("\nProductos disponibles:")
-            for i, (nombre, datos) in enumerate(productos_disponibles, 1):
-                print(f"{i}. {nombre.title()} - Q{datos['precio']:.2f} ({datos['cantidad']} disponibles)")
+            print("🍞 Productos disponibles:")
+            for i, (nombre, info) in enumerate(disponibles, 1):
+                print(f"{i}. {nombre:<15} | Q{info['precio']:.2f} | {info['cantidad']} unidades")
 
             try:
-                seleccion = int(input(f"\nSelecciona un producto (1-{len(productos_disponibles)}) o 0 para terminar: "))
+                seleccion = int(input("\nSelecciona el número del producto (o 0 para salir): "))
                 if seleccion == 0:
                     break
-                if not 1 <= seleccion <= len(productos_disponibles):
-                    print("Opción inválida.")
+                if not (1 <= seleccion <= len(disponibles)):
+                    lento("Opción inválida.")
                     continue
 
-                nombre_producto, datos = productos_disponibles[seleccion - 1]
-                stock = datos["cantidad"]
-                precio = datos["precio"]
-
-                cantidad = int(input(f"¿Cuántos '{nombre_producto}' deseas?: "))
+                nombre, info = disponibles[seleccion - 1]
+                stock = info["cantidad"]
+                precio = info["precio"]
+                cantidad = int(input(f"¿Cuántos '{nombre}' deseas?: "))
 
                 if cantidad > stock:
-                    print(f"Sólo tenemos {stock} unidades.")
+                    lento(f"Sólo hay {stock}.")
                     while True:
-                        aceptar = input(f"¿Deseas comprar {stock}? (si/no): ").strip().lower()
+                        aceptar = input(f"¿Deseas los {stock}? (si/no): ").strip().lower()
                         if aceptar not in ['si', 'no']:
-                            print("Por favor escribe 'si' o 'no'.")
+                            lento("Responde con 'si' o 'no'.")
                             continue
                         break
                     if aceptar == 'si':
                         cantidad = stock
                     else:
                         while True:
-                            otro = input("¿Deseas intentar con otro producto? (si/no): ").strip().lower()
-                            if otro not in ['si', 'no']:
-                                print("Por favor escribe 'si' o 'no'.")
+                            otra = input("¿Quieres otro producto? (si/no): ").strip().lower()
+                            if otra not in ['si', 'no']:
+                                lento("Responde con 'si' o 'no'.")
                                 continue
                             break
-                        if otro == 'no':
+                        if otra == 'no':
                             break
                         else:
                             continue
 
                 if cantidad > 0:
-                    self.carrito[nombre_producto] = self.carrito.get(nombre_producto, 0) + cantidad
-                    panaderia.inventario[nombre_producto]["cantidad"] -= cantidad
-                    subtotal = cantidad * precio
-                    total += subtotal
-                    print(f"{cantidad} '{nombre_producto}' añadidos - Subtotal: Q{subtotal:.2f}")
+                    self.carrito[nombre] = self.carrito.get(nombre, 0) + cantidad
+                    panaderia.inventario[nombre]["cantidad"] -= cantidad
+                    total += cantidad * precio
+
             except ValueError:
-                print("Entrada inválida.")
+                lento("Entrada inválida.")
 
         if self.carrito:
-            print("\n" + "="*50)
-            print(f"Resumen de compra de {self.nombre}:")
-            for prod, cant in self.carrito.items():
-                precio_unitario = panaderia.inventario[prod]["precio"]
-                print(f"- {prod.title()} x{cant} = Q{cant * precio_unitario:.2f}")
-            print(f"\nTotal a pagar: Q{total:.2f}")
-            print("="*50)
-            print(f"¡Gracias por tu compra, {self.nombre}! Hasta pronto.\n")
+            marco_madera("🧾 TU CUENTA 🧾")
+            for producto, cantidad in self.carrito.items():
+                precio = panaderia.inventario[producto]["precio"]
+                print(f"{producto} x{cantidad} → Q{cantidad * precio:.2f}")
+            print(f"\n💰 TOTAL: Q{total:.2f}")
+            print(f"\n🌄 Gracias por tu compra, {self.nombre}. ¡Vuelve pronto!")
         else:
-            print("\nNo realizaste ninguna compra. ¡Vuelve pronto!\n")
-
+            lento("No realizaste ninguna compra. ¡Te esperamos la próxima vez!")
 
 def main():
-    propietario = input("Ingrese el nombre del propietario: ").strip()
+    clear()
+    logo_volcan()
+    lento("🌄 Bienvenido al sistema artesanal de panadería chapina 🌽\n")
+    propietario = input("¿Cuál es tu nombre, maestro panadero? ").strip().title()
     panaderia = Panaderia(propietario)
     panaderia.bienvenida()
     panaderia.agregar_inventario()
 
     while True:
-        abrir = input("¿Deseas abrir la panadería para clientes? (si/no): ").strip().lower()
+        abrir = input("\n¿Abrimos la panadería para los clientes? (si/no): ").strip().lower()
         if abrir not in ['si', 'no']:
-            print("Por favor, escribe 'si' o 'no'.")
+            lento("Responde con 'si' o 'no'.")
             continue
         if abrir == 'no':
-            print("Panadería cerrada. ¡Hasta la próxima!")
+            lento("🛑 Panadería cerrada por hoy. ¡Hasta la próxima hornada!")
             break
+
         cliente = Cliente()
         cliente.bienvenida()
         cliente.comprar(panaderia)
+        panaderia.mostrar_inventario()
 
+        while True:
+            seguir = input("¿Deseas atender a otro cliente? (si/no): ").strip().lower()
+            if seguir not in ['si', 'no']:
+                lento("Responde con 'si' o 'no'.")
+                continue
+            break
+        if seguir == 'no':
+            lento("🌅 Cerrando el día con aroma a pan recién hecho... ¡Buen trabajo!")
+            break
 
 if __name__ == "__main__":
     main()
